@@ -120,3 +120,66 @@ footer { color: var(--muted); font-size: 12px; padding: 8px 2px; }
   #flightSel { max-width: 100%; width: 100%; }
   .settings input { min-width: 0; width: 100%; }
 }
+
+/* ---- navigation / user box (v3) */
+.topnav { display: inline-flex; gap: 2px; margin-left: 8px; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+.topnav a { padding: 5px 10px; font: 600 12px var(--font); color: var(--muted); text-decoration: none; background: var(--panel2); }
+.topnav a.on { background: var(--cyan); color: #04121a; }
+.userbox { font-size: 12px; color: var(--muted); display: inline-flex; gap: 6px; align-items: center; }
+.userbox b { color: var(--text); }
+.role { font: 700 10px var(--mono); padding: 2px 6px; border-radius: 3px; border: 1px solid var(--cyan); color: var(--cyan); text-transform: uppercase; }
+.mono { font-family: var(--mono); }
+.err { color: var(--red); }
+
+/* ---- import wizard */
+dialog.imp { width: min(1100px, calc(100vw - 32px)); max-height: calc(100vh - 32px); padding: 0; border: 1px solid var(--line); border-radius: 12px;
+  background: var(--panel); color: var(--text); display: none; flex-direction: column; }
+dialog.imp[open] { display: flex; }
+dialog.imp::backdrop { background: rgba(3,5,8,.75); }
+.imp-head { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; border-bottom: 1px solid var(--line); margin: 0; }
+.imp-head h2 { margin: 0; font-size: 16px; }
+.imp-tabs { display: flex; gap: 4px; padding: 8px 16px 0; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+.imp-tabs button { background: transparent; border: 0; border-bottom: 2px solid transparent; color: var(--muted); padding: 6px 10px; font: 600 13px var(--font); cursor: pointer; }
+.imp-tabs button.on { color: var(--text); border-bottom-color: var(--amber); }
+.imp-tabs button:disabled { opacity: .45; cursor: default; }
+.imp-body { padding: 14px 16px; overflow: auto; flex: 1; min-height: 240px; }
+.imp-drop { display: flex; flex-direction: column; gap: 4px; align-items: center; justify-content: center; border: 2px dashed var(--line); border-radius: 10px; padding: 26px 16px; cursor: pointer; text-align: center; }
+.imp-drop:hover, .imp-drop.over { border-color: var(--amber); }
+.imp-sample-list { display: flex; flex-wrap: wrap; gap: 6px; }
+.imp-sample-list .btn { white-space: normal; text-align: left; }
+.kv { margin-top: 12px; } .kv th { text-align: left; color: var(--muted); font-size: 12px; padding: 4px 10px 4px 0; vertical-align: top; width: 90px; font-weight: 600; }
+.kv td { padding: 4px 0; font-size: 13px; }
+.imp-row { display: flex; flex-wrap: wrap; gap: 10px 14px; align-items: end; margin-bottom: 10px; }
+.imp-row label, .imp-time label { display: flex; flex-direction: column; gap: 3px; font-size: 12px; color: var(--muted); }
+.imp-row label.chk { flex-direction: row; align-items: center; gap: 6px; }
+.imp input[type=number], .imp input:not([type]) { background: var(--panel2); color: var(--text); border: 1px solid var(--line); border-radius: 6px; padding: 6px 8px; font: inherit; width: 90px; }
+.imp-time { border: 1px solid var(--line); border-radius: 8px; margin: 0 0 10px; padding: 8px 12px; }
+.imp-time legend { font-weight: 600; font-size: 13px; padding: 0 4px; }
+.imp-map { max-height: 46vh; }
+.imp table th { text-align: left; font-size: 11px; color: var(--muted); padding: 4px 6px; border-bottom: 1px solid var(--line); position: sticky; top: 0; background: var(--panel); }
+.imp table td { padding: 5px 6px; border-bottom: 1px solid var(--line); font-size: 12.5px; vertical-align: middle; }
+.imp tr.grp td { color: var(--amber); font-weight: 600; font-size: 12px; background: var(--panel2); }
+.imp tr.missing td:first-child { box-shadow: inset 3px 0 var(--red); }
+.imp select { max-width: 240px; }
+.imp-foot { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 10px 16px; border-top: 1px solid var(--line); flex-wrap: wrap; }
+.imp-actions { display: flex; flex-wrap: wrap; gap: 6px; }
+#impMsg.err { color: var(--red); }
+.qc-head { display: flex; gap: 14px; align-items: center; margin-bottom: 10px; }
+.qc-score { display: flex; align-items: baseline; gap: 2px; padding: 8px 14px; border-radius: 10px; border: 2px solid var(--green); }
+.qc-score b { font: 700 28px var(--mono); } .qc-score span { color: var(--muted); }
+.qc-score.usable { border-color: var(--green); color: var(--green); } .qc-score.limited { border-color: var(--amber); color: var(--amber); } .qc-score.reject { border-color: var(--red); color: var(--red); }
+.qc-list { list-style: none; padding: 0; margin: 0 0 12px; display: grid; gap: 4px; }
+.qc-list li { display: flex; gap: 8px; align-items: flex-start; font-size: 13px; padding: 5px 8px; border-radius: 6px; background: var(--panel2); }
+.qc-list i { font-style: normal; font: 700 11px var(--mono); width: 18px; height: 18px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; flex: none; margin-top: 1px; }
+.qc-list .ok i { background: var(--green); color: #04130a; } .qc-list .info i { background: var(--cyan); color: #04121a; }
+.qc-list .warn i { background: var(--amber); color: #111; } .qc-list .fail i { background: var(--red); color: #fff; }
+.qc-stats td.warn { color: var(--amber); font-weight: 600; }
+.imp h3 { font-size: 13px; margin: 12px 0 6px; }
+.ev-chips { display: flex; flex-wrap: wrap; gap: 4px; }
+.qcb { font: 700 11px var(--mono); padding: 2px 6px; border-radius: 3px; border: 1px solid var(--green); color: var(--green); }
+.qcb.limited { border-color: var(--amber); color: var(--amber); } .qcb.reject { border-color: var(--red); color: var(--red); }
+.qcd summary { cursor: pointer; color: var(--cyan); font-size: 12px; } .qcd ul { margin: 4px 0; padding-left: 18px; font-size: 12px; }
+.qcd li.warn { color: var(--amber); } .qcd li.fail { color: var(--red); } .qcd li.info { color: var(--muted); }
+table.meas th, table.meas td { font-size: 12px; padding: 3px 8px 3px 0; text-align: left; white-space: nowrap; }
+table.meas td { font-family: var(--mono); }
+@media (max-width: 640px) { .imp-body { padding: 12px; } .topnav { margin-left: 0; } }

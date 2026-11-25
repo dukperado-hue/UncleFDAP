@@ -18,8 +18,12 @@
       try {
         const [ap, cfg, idx] = await Promise.all(['data/airports.json', 'data/events-config.json', 'data/flights/index.json']
           .map(u => fetch(u).then(r => { if (!r.ok) throw new Error(u + ' ' + r.status); return r.json(); })));
-        this.airportsRaw = ap; this.airports = FDM.prepareAirports(ap); this.cfg = cfg; this.index = idx.flights;
-        this.vfe = {}; for (const [k, v] of Object.entries(cfg.vfe_kt)) this.vfe[+k] = v;
+        const smp = await fetch('data/samples/index.json').then(r => r.ok ? r.json() : { flights: [] }).catch(() => ({ flights: [] }));
+        this.airportsRaw = ap; this.airports = FDM.prepareAirports(ap); this.cfg = cfg;
+        this.index = idx.flights.map(f => Object.assign({ group: 'scenario', profile: 'A320', path: 'data/flights/' + f.file }, f))
+          .concat(smp.flights.map(f => Object.assign({}, f, { group: 'sample', path: 'data/samples/' + f.normalized_file, raw: 'data/samples/' + f.file })));
+        if (window.Backend && Backend.server) this.index = await Backend.flightIndex();
+        this.setVfe(FDM.resolveConfig(cfg));
       } catch (e) { this.fatal('Could not load data files: ' + e.message + ' (serve the folder over http, e.g. "python -m http.server")'); return; }
 
       try {
@@ -29,14 +33,26 @@
 
       $('#imagery').value = store.get('fdm.imagery') || 'osm';
       $('#iontoken').value = store.get('fdm.ion') || '';
-      const sel = $('#flightSel');
-      for (const f of this.index) {
-        const o = document.createElement('option'); o.value = f.id; o.textContent = `${f.id.slice(0, 3)} · ${f.title_th}`; sel.appendChild(o);
-      }
+      this.fillFlightSel();
       this.wire();
       const want = decodeURIComponent(location.hash.slice(1));
-      await this.selectFlight(this.index.find(f => f.id === want) ? want : this.index[0].id);
+      if (!this.index.length) { $('#status').textContent = 'No flights yet · ยังไม่มีเที่ยวบิน — use Import'; }
+      else await this.selectFlight(this.index.find(f => f.id === want) ? want : this.index[0].id);
+      if (want === 'import') ImportUI.open();
       requestAnimationFrame(ts => this.loop(ts));
+    },
+
+    setVfe(cfg) { this.fcfg = cfg; this.vfe = {}; for (const [k, v] of Object.entries(cfg.vfe_kt)) this.vfe[+k] = v; },
+
+    fillFlightSel() {
+      const sel = $('#flightSel'); sel.innerHTML = '';
+      const groups = { scenario: 'A320 scenarios (synthetic) · ฉากจำลอง', sample: 'Imported raw files (synthetic G1000 / decoder) · ไฟล์ดิบตัวอย่าง', server: 'FDAP server flights · เที่ยวบินบนเซิร์ฟเวอร์' };
+      for (const [g, label] of Object.entries(groups)) {
+        const fs = this.index.filter(f => f.group === g); if (!fs.length) continue;
+        const og = document.createElement('optgroup'); og.label = label;
+        for (const f of fs) { const o = document.createElement('option'); o.value = f.id; o.textContent = `${f.id.split('_')[0]} · ${f.title_th || f.title || f.id}`; og.appendChild(o); }
+        sel.appendChild(og);
+      }
     },
 
     fatal(msg) { $('#status').textContent = msg; $('#status').className = 'status err'; },
@@ -58,7 +74,7 @@
       }));
       $('#imagery').addEventListener('change', e => { store.set('fdm.imagery', e.target.value); if (!this.noScene) Scene.setImagery(e.target.value); });
       $('#saveToken').addEventListener('click', () => { store.set('fdm.ion', $('#iontoken').value.trim()); location.reload(); });
-      $('#csvFile').addEventListener('change', e => { if (e.target.files[0]) this.loadUserCSV(e.target.files[0]); e.target.value = ''; });
+      $('#importBtn').addEventListener('click', () => ImportUI.open());
       $('#expEvents').addEventListener('click', () => Exporter.eventsCSV(this.flight, this.events));
       $('#expData').addEventListener('click', () => Exporter.dataCSV(this.flight, this.rows, this.t0, this.t1));
       $('#expSeg').addEventListener('click', () => Exporter.dataCSV(this.flight, this.rows, this.t - 60, this.t + 60, `_t${Math.round(this.t)}`));
@@ -71,17 +87,18 @@
         else if (e.code === 'ArrowLeft') this.seek(this.t - (e.shiftKey ? 30 : 5));
       });
       const drop = $('#dropzone');
-      ['dragover', 'dragenter'].forEach(ev => document.addEventListener(ev, e => { e.preventDefault(); drop.classList.add('show'); }));
+      ['dragover', 'dragenter'].forEach(ev => document.addEventListener(ev, e => { e.preventDefault(); if (!document.querySelector('dialog[open]')) drop.classList.add('show'); }));
       ['dragleave', 'drop'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.remove('show'); }));
-      drop.addEventListener('drop', e => { const f = e.dataTransfer.files[0]; if (f) this.loadUserCSV(f); });
+      drop.addEventListener('drop', e => { const f = e.dataTransfer.files[0]; if (f) ImportUI.open(f); });
     },
 
     async selectFlight(id) {
       const meta = this.index.find(f => f.id === id);
       $('#flightSel').value = id;
       $('#status').textContent = 'Loading ' + meta.file + ' ...'; $('#status').className = 'status';
-      const text = await fetch('data/flights/' + meta.file).then(r => r.text());
+      const text = (window.Backend && Backend.server) ? await Backend.flightCSV(meta) : await fetch(meta.path).then(r => r.text());
       const rows = this.parseCSV(text);
+      if (meta.qc_file && !meta.qc) meta.qc = await fetch('data/samples/' + meta.qc_file).then(r => r.json()).catch(() => null);
       history.replaceState(null, '', '#' + id);
       this.loadFlight(meta, rows);
     },
@@ -99,33 +116,18 @@
       });
     },
 
-    loadUserCSV(file) {
-      const reader = new FileReader();
-      reader.onload = () => {
-        const rows = this.parseCSV(reader.result);
-        const missing = REQUIRED.filter(k => !(rows.length && k in rows[0]));
-        if (missing.length) { this.fatal(`CSV is missing required columns: ${missing.join(', ')} (see README)`); return; }
-        for (const r of rows) {
-          if (!('air_ground' in r) || Number.isNaN(r.air_ground)) r.air_ground = (Number.isFinite(r.ra_ft) ? r.ra_ft > 1 : r.ias_kt > 60) ? 1 : 0;
-          for (const k of ['ra_ft', 'vs_fpm', 'nz_g', 'gs_kt', 'tas_kt', 'flap', 'gear', 'trk_true_deg']) if (!(k in r)) r[k] = NaN;
-          if (Number.isNaN(r.nz_g)) r.nz_g = 1;
-          if (Number.isNaN(r.vs_fpm)) r.vs_fpm = 0;
-          if (Number.isNaN(r.trk_true_deg)) r.trk_true_deg = r.hdg_true_deg;
-          if (Number.isNaN(r.gs_kt)) r.gs_kt = r.ias_kt;
-        }
-        const meta = { id: file.name.replace(/\.csv$/i, ''), title: file.name, title_th: 'ไฟล์ที่อัปโหลด (ประมวลผลในเครื่องเท่านั้น)',
-          vapp_kt: this.cfg.vapp_default_kt, description_th: 'ข้อมูลจากไฟล์ในเครื่อง ไม่ได้ส่งออกไปที่ใด', local: true };
-        $('#flightSel').value = '';
-        history.replaceState(null, '', location.pathname);
-        this.loadFlight(meta, rows);
-      };
-      reader.readAsText(file);
+    loadImported(meta, rows) {
+      $('#flightSel').value = '';
+      history.replaceState(null, '', location.pathname);
+      this.loadFlight(meta, rows);
     },
 
     loadFlight(meta, rows) {
       this.flight = meta; this.rows = rows;
       this.t0 = rows[0].time_s; this.t1 = rows[rows.length - 1].time_s; this.t = this.t0;
-      this.events = FDM.detectEvents(rows, this.cfg, this.airports, meta.vapp_kt);
+      this.setVfe(FDM.resolveConfig(this.cfg, meta.profile));
+      this.events = FDM.detectEvents(rows, this.fcfg, this.airports, meta.vapp_kt);
+      this.measures = FDM.measurements(rows, this.fcfg, this.airports, meta.vapp_kt);
       this.summary = FDM.flightSummary(rows, this.airports);
       // reference airport for the altitude-tape ground band and terrain offset
       const r0 = rows[Math.floor(rows.length / 2)];
@@ -134,7 +136,7 @@
         const [x, y] = new FDM.Frame(ap.lat, ap.lon).toXY(r0.lat, r0.lon); const d = Math.hypot(x, y);
         if (!best || d < best.d) best = { ap, d };
       }
-      this.refAirport = meta.airport ? this.airports[meta.airport] : best.ap;
+      this.refAirport = (meta.airport && this.airports[meta.airport]) ? this.airports[meta.airport] : best.ap;
       if (!this.noScene) { Scene.loadFlight(rows, this.events, this.refAirport ? this.refAirport.geoid_undulation_m : 0); }
       Charts.onSeek = t => this.seek(t);
       Charts.build($('#charts'), rows, this.events, this.vfe);
@@ -155,10 +157,25 @@
         ['Take-off', s.takeoffs.map(x => `${x.rwy} @ ${fmtT(x.t)}`).join('<br>') || '-'],
         ['Landing', s.landings.map(x => `${x.rwy} @ ${fmtT(x.t)} · TD ${x.along_m ?? '?'} m past THR`).join('<br>') || '-'],
         ['Max', `${s.max_alt_ft.toFixed(0)} ft · ${s.max_ias_kt.toFixed(0)} kt · ${s.max_nz_g.toFixed(2)} g`],
+        ['Event set', `${esc(this.fcfg.profile)} <span class="th">${esc((this.fcfg.profiles[this.fcfg.profile] || {}).label_th || '')}</span>`],
       ];
+      if (f.qc) rows.push(['Data quality', `<span class="qcb ${f.qc.verdict}">${f.qc.score}/100</span> ${esc({ usable: 'usable · ใช้ได้', limited: 'limited · มีข้อจำกัด', reject: 'review · ต้องตรวจ' }[f.qc.verdict])}
+        <details class="qcd"><summary>checks</summary><ul>${f.qc.checks.filter(c => c.sev !== 'ok').map(c => `<li class="${c.sev}">${esc(c.en)}</li>`).join('')}</ul></details>`]);
+      const L = this.measures.landings, T = this.measures.takeoffs, G = this.fcfg.gates_ft;
+      const mv = (v, u = '') => v == null ? '—' : `${v}${u}`;
+      const meas = (L.length || T.length) ? `<h2>Routine measurements <span class="th">ค่าวัดทุกเที่ยวบิน (Doc 10000 §2.3.1)</span></h2>
+        <div class="tablewrap"><table class="meas"><thead><tr><th></th>${L.map((m, i) => `<th>LDG ${i + 1}<br><span class="th">${esc(m.rwy || '?')}</span></th>`).join('')}</tr></thead><tbody>
+        ${L.length ? [['TD g', m => mv(m.td_nz_g)], ['TD V/S', m => mv(m.td_vs_fpm, ' fpm')], ['TD distance', m => mv(m.td_dist_m, ' m')],
+          ...G.map(g => [`IAS−Vapp @${g}`, m => mv(m['ias_dev_' + g], ' kt')]), ...G.slice(0, 2).map(g => [`V/S @${g}`, m => mv(m['vs_' + g], ' fpm')]),
+          ['Max ROD final', m => mv(m.max_rod_final_fpm, ' fpm')], ['TD pitch', m => mv(m.td_pitch_deg, '°')], ['TD max bank', m => mv(m.td_roll_max_deg, '°')]]
+          .map(([k, fn]) => `<tr><th>${k}</th>${L.map(m => `<td>${fn(m)}</td>`).join('')}</tr>`).join('') : ''}
+        </tbody></table></div>${T.length ? `<p class="small">Take-off: ${T.map(t => `${esc(t.rwy || '?')} pitch ${mv(t.lo_pitch_deg, '°')} · max rate ${mv(t.max_pitch_rate, '°/s')} · IAS ${mv(t.lo_ias_kt, ' kt')}`).join('<br>')}</p>` : ''}` : '';
       $('#info').innerHTML = `<p class="desc">${esc(f.description_th || '')}</p>` +
         '<table>' + rows.map(([k, v]) => `<tr><th>${k}</th><td>${v}</td></tr>`).join('') + '</table>' +
-        (f.local ? '' : `<p class="small"><a href="reports/${encodeURIComponent(f.id)}_report.pdf" target="_blank" rel="noopener">Pre-generated PDF report (Python)</a> · <a href="data/flights/${encodeURIComponent(f.file)}" download>raw CSV</a></p>`);
+        meas + (f.local || f.group === 'server' ? '' : f.group === 'sample'
+          ? `<p class="small"><a href="${esc(f.raw)}" download>raw file (${esc(f.format)})</a> · <a href="${esc(f.path)}" download>normalised CSV</a> · <a href="#" id="tryImport">open the raw file in the import wizard</a></p>`
+          : `<p class="small"><a href="reports/${encodeURIComponent(f.id)}_report.pdf" target="_blank" rel="noopener">Pre-generated PDF report (Python)</a> · <a href="${esc(f.path)}" download>raw CSV</a></p>`);
+      const ti = $('#tryImport'); if (ti) ti.addEventListener('click', async e => { e.preventDefault(); await ImportUI.open(); ImportUI.loadSample(f); });
     },
 
     renderEvents() {
@@ -270,5 +287,5 @@
   function esc(s) { return String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
 
   window.App = App;
-  window.addEventListener('DOMContentLoaded', () => App.init());
+  window.addEventListener('DOMContentLoaded', async () => { if (window.Backend) await Backend.init(); App.init(); });
 })();
