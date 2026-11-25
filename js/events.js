@@ -71,6 +71,64 @@
   }
   const argBy = (i0, i1, f) => { let b = i0; for (let i = i0; i <= i1; i++) if (f(i) > f(b)) b = i; return b; };
 
+  // ---- aircraft-type profiles (mirrors fdm_common.resolve_config)
+  const strip = v => { if (v && typeof v === 'object' && !Array.isArray(v)) { const o = Object.assign({}, v); delete o._replace; return o; } return v; };
+  function merge(base, over) {
+    const isObj = v => v && typeof v === 'object' && !Array.isArray(v);
+    if (!isObj(over) || !isObj(base) || over._replace) return strip(over);
+    const out = Object.assign({}, base);
+    for (const [k, v] of Object.entries(over)) out[k] = (k in base) ? merge(base[k], v) : strip(v);
+    return out;
+  }
+  function resolveConfig(cfg, profile) {
+    const name = profile || cfg.default_profile;
+    const prof = (cfg.profiles || {})[name] || {};
+    const over = {}; for (const [k, v] of Object.entries(prof)) if (k !== 'label' && k !== 'label_th') over[k] = v;
+    const base = {}; for (const [k, v] of Object.entries(cfg)) if (k !== 'profiles') base[k] = v;
+    const out = merge(base, over);
+    out.profile = name; out.profiles = cfg.profiles || {};
+    return out;
+  }
+
+  // lowest point of each go-around: below 1000 ft RA, then climb 400 ft without touching down
+  function goArounds(rows, air) {
+    const n = rows.length, gas = [];
+    for (let i = 1; i < n;) {
+      if (air[i] && g(rows[i], 'ra_ft') < 1000 && rows[i].vs_fpm < 0) {
+        let jmin = i, j = i;
+        while (j < n && air[j]) {
+          const ra = g(rows[j], 'ra_ft');
+          if (isNum(ra) && ra < g(rows[jmin], 'ra_ft')) jmin = j;
+          if ((isNum(ra) && ra > g(rows[jmin], 'ra_ft') + 400) || (!isNum(ra) && j > jmin)) { gas.push(jmin); break; }
+          j++;
+        }
+        i = j + 1;
+      } else i++;
+    }
+    return gas;
+  }
+  function gateIndex(rows, end, prev, gate) {
+    for (let j = end; j > Math.max(prev, 0); j--) if (g(rows[j], 'ra_ft') <= gate && gate < g(rows[j - 1], 'ra_ft')) return j;
+    return null;
+  }
+
+  // Ground elevation (ft) under a point: interpolated along a runway when on it,
+  // else the nearest threshold elevation within 15 km; NaN when far from any airport.
+  function groundElevAt(airports, lat, lon) {
+    let near = null;
+    for (const ap of Object.values(airports)) {
+      const fr = new Frame(ap.lat, ap.lon); const [x, y] = fr.toXY(lat, lon);
+      for (const r of Object.values(ap.runways)) {
+        const [a, c] = rwyCoords(fr, r, x, y);
+        const p = ap.runways[r.pair];
+        if (Math.abs(c) < 100 && a >= 0 && a <= r.length_m && p) return r.thr_elev_ft + (p.thr_elev_ft - r.thr_elev_ft) * a / r.length_m;
+        const [tx, ty] = fr.toXY(r.lat, r.lon); const d = Math.hypot(x - tx, y - ty);
+        if (!near || d < near.d) near = { d, e: r.thr_elev_ft };
+      }
+    }
+    return near && near.d < 15000 ? near.e : NaN;
+  }
+
   function detectEvents(rows, cfg, airports, vapp) {
     const E = cfg.events, uc = cfg.unstable_criteria;
     vapp = vapp || cfg.vapp_default_kt;
@@ -83,6 +141,7 @@
     const r1 = v => Math.round(v * 10) / 10, r2 = v => Math.round(v * 100) / 100;
     const ev = (code, level, i0, i1, ipk, value, detail = '') => {
       const d = E[code];
+      if (d.enabled === false) return;
       events.push({ code, level, name: d.name, th: d.th, t_start: r1(t[i0]), t_end: r1(t[i1]), t_peak: r1(t[ipk]),
         value: value == null ? null : r2(value), unit: d.unit || '', detail, idx: ipk });
     };
@@ -143,28 +202,14 @@
         }
     }
 
-    // go-arounds
-    const gas = [];
-    for (let i = 1; i < n;) {
-      if (air[i] && g(rows[i], 'ra_ft') < 1000 && rows[i].vs_fpm < 0) {
-        let jmin = i, j = i;
-        while (j < n && air[j]) {
-          const ra = g(rows[j], 'ra_ft');
-          if (isNum(ra) && ra < g(rows[jmin], 'ra_ft')) jmin = j;
-          if ((isNum(ra) && ra > g(rows[jmin], 'ra_ft') + 400) || (!isNum(ra) && j > jmin)) { gas.push(jmin); break; }
-          j++;
-        }
-        i = j + 1;
-      } else i++;
-    }
+    const gas = goArounds(rows, air);
     for (const k of gas) ev('GO_AROUND', 1, k, k, k, rows[k].ra_ft, `minimum RA ${rows[k].ra_ft.toFixed(0)} ft`);
 
     const marks = [...touchdowns, ...gas, ...liftoffs].sort((a, b) => a - b);
     for (const end of [...touchdowns, ...gas].sort((a, b) => a - b)) {
       const prev = Math.max(0, ...marks.filter(m => m < end));
       for (const code of ['UNSTABLE_1000', 'UNSTABLE_500']) {
-        const gate = E[code].gate_ft; let gi = null;
-        for (let j = end; j > prev; j--) if (g(rows[j], 'ra_ft') <= gate && gate < g(rows[j - 1], 'ra_ft')) { gi = j; break; }
+        const gi = gateIndex(rows, end, prev, E[code].gate_ft);
         if (gi === null) continue;
         const r = Object.assign({}, rows[gi]);
         const w = rows.slice(Math.max(0, gi - 2), gi + 3);
@@ -194,6 +239,54 @@
     return events;
   }
 
+  // ---- routine measurements (mirrors fdm_common.measurements)
+  const rnd = (v, nd = 1) => (v == null || Number.isNaN(v)) ? null : Math.round(v * 10 ** nd) / 10 ** nd;
+  function measurements(rows, cfg, airports, vapp) {
+    vapp = vapp || cfg.vapp_default_kt;
+    const gates = cfg.gates_ft || [1000, 500, 50];
+    const n = rows.length, out = { landings: [], takeoffs: [], flight: {} };
+    if (n < 3) return out;
+    const t = rows.map(r => r.time_s), dt = (t[n - 1] - t[0]) / (n - 1);
+    const air = rows.map(r => g(r, 'air_ground') >= 0.5);
+    const liftoffs = [], touchdowns = [];
+    for (let i = 1; i < n; i++) { if (air[i] && !air[i - 1]) liftoffs.push(i); if (!air[i] && air[i - 1]) touchdowns.push(i); }
+    const gas = goArounds(rows, air);
+    const marks = [...touchdowns, ...gas, ...liftoffs].sort((a, b) => a - b);
+    for (const td of touchdowns) {
+      const prev = Math.max(0, ...marks.filter(m => m < td));
+      const j0 = Math.max(0, td - Math.trunc(1 / dt)), j1 = Math.min(n - 1, td + Math.trunc(3 / dt));
+      const k0 = Math.max(prev, td - Math.trunc(3 / dt));
+      const { rwy, along } = findRunway(airports, rows[td].lat, rows[td].lon, rows[td].hdg_true_deg);
+      let nz = -Infinity; for (let j = j0; j <= j1; j++) nz = Math.max(nz, rows[j].nz_g);
+      let roll = -Infinity; for (let k = k0; k <= td; k++) roll = Math.max(roll, Math.abs(rows[k].roll_deg));
+      const m = { t: rnd(t[td]), rwy: rwy ? `${rwy.icao} ${rwy.id}` : null, td_nz_g: rnd(nz, 3), td_vs_fpm: rnd(rows[td - 1].vs_fpm, 0),
+        td_pitch_deg: rnd(rows[td].pitch_deg, 2), td_roll_max_deg: rnd(roll, 2), td_ias_kt: rnd(rows[td].ias_kt), td_dist_m: rwy ? rnd(along, 0) : null };
+      for (const gate of gates) {
+        const gi = gateIndex(rows, td, prev, gate);
+        if (gi === null) { m['ias_dev_' + gate] = m['vs_' + gate] = m['gs_dev_' + gate] = null; continue; }
+        const w = rows.slice(Math.max(0, gi - 2), gi + 3);
+        m['ias_dev_' + gate] = rnd(w.reduce((s, x) => s + x.ias_kt, 0) / w.length - vapp);
+        m['vs_' + gate] = rnd(w.reduce((s, x) => s + x.vs_fpm, 0) / w.length, 0);
+        m['gs_dev_' + gate] = rnd(g(rows[gi], 'gs_dev_dot'), 2);
+      }
+      const rod = []; for (let k = prev; k < td; k++) { const ra = g(rows[k], 'ra_ft'); if (50 < ra && ra < gates[0]) rod.push(-rows[k].vs_fpm); }
+      m.max_rod_final_fpm = rod.length ? rnd(Math.max(...rod), 0) : null;
+      out.landings.push(m);
+    }
+    for (const lo of liftoffs) {
+      const j0 = Math.max(1, lo - Math.trunc(10 / dt)), j1 = Math.min(n - 2, lo + Math.trunc(3 / dt));
+      let pr = -Infinity; for (let j = j0; j <= j1; j++) pr = Math.max(pr, (rows[j + 1].pitch_deg - rows[j - 1].pitch_deg) / (t[j + 1] - t[j - 1]));
+      const { rwy } = findRunway(airports, rows[lo].lat, rows[lo].lon, rows[lo].hdg_true_deg);
+      out.takeoffs.push({ t: rnd(t[lo]), rwy: rwy ? `${rwy.icao} ${rwy.id}` : null, lo_pitch_deg: rnd(rows[lo].pitch_deg, 2),
+        lo_ias_kt: rnd(rows[lo].ias_kt), max_pitch_rate: j1 >= j0 ? rnd(pr, 2) : null });
+    }
+    let maxBank = null, maxAlt = -Infinity;
+    rows.forEach((r, i) => { if (air[i]) maxBank = Math.max(maxBank ?? 0, Math.abs(r.roll_deg)); maxAlt = Math.max(maxAlt, r.alt_ft); });
+    out.flight = { duration_s: rnd(t[n - 1] - t[0]), max_alt_ft: rnd(maxAlt, 0), max_bank_deg: rnd(maxBank, 1),
+      n_takeoffs: liftoffs.length, n_landings: touchdowns.length, n_go_arounds: gas.length };
+    return out;
+  }
+
   function flightSummary(rows, airports) {
     const air = rows.map(r => g(r, 'air_ground') >= 0.5);
     const out = { duration_s: rows[rows.length - 1].time_s - rows[0].time_s,
@@ -207,5 +300,6 @@
     return out;
   }
 
-  global.FDM = { prepareAirports, Frame, rwyCoords, angdiff, findRunway, detectEvents, flightSummary, dmsToDeg };
+  global.FDM = { prepareAirports, Frame, rwyCoords, angdiff, findRunway, detectEvents, flightSummary, dmsToDeg,
+    resolveConfig, measurements, goArounds, groundElevAt };
 })(window);

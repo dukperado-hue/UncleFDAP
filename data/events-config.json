@@ -1,23 +1,126 @@
 {
-  "_comment": "FDM event thresholds shared by the web viewer (js/events.js) and tools/analyze.py. Levels: 1 = info, 2 = caution, 3 = warning. Values are generic demo values, not an operator's approved event set.",
+  "_comment": "FDM event thresholds shared by the web viewer (js/events.js) and tools/fdm_common.py. Levels: 1 = info, 2 = caution, 3 = warning. Top-level values are the A320 baseline; 'profiles' deep-merge overrides per aircraft type (an object with \"_replace\": true replaces instead of merging; \"enabled\": false switches an event off). Generic demo values, not an operator's approved event set.",
   "vapp_default_kt": 140,
-  "vfe_kt": { "1": 230, "2": 200, "3": 185, "4": 177 },
+  "vfe_kt": {
+    "1": 230,
+    "2": 200,
+    "3": 185,
+    "4": 177
+  },
   "events": {
-    "HIGH_PITCH_LIFTOFF":   { "name": "High pitch at lift-off", "th": "มุมเงยสูงขณะยกตัว (เสี่ยงหางครูด)", "l2": 9.5, "l3": 10.5, "unit": "deg" },
-    "HIGH_PITCH_RATE_ROT":  { "name": "High pitch rate at rotation", "th": "อัตราเงยหัวเร็วเกินขณะ rotate", "l2": 3.5, "l3": 4.5, "unit": "deg/s" },
-    "FLAP_OVERSPEED":       { "name": "Flap placard speed exceedance", "th": "ความเร็วเกิน VFE ของแฟลป", "l2": 0, "l3": 5, "min_s": 2, "unit": "kt over VFE" },
-    "SPEED_250_BELOW_FL100":{ "name": "IAS > 250 kt below 10,000 ft", "th": "ความเร็วเกิน 250 kt ต่ำกว่า 10,000 ft", "l2": 255, "l3": 270, "min_s": 5, "unit": "kt" },
-    "HIGH_BANK":            { "name": "High bank angle", "th": "มุมเอียงสูง", "l2": 33, "l3": 40, "unit": "deg" },
-    "HIGH_BANK_LOW_ALT":    { "name": "High bank angle below 500 ft RA", "th": "มุมเอียงสูงที่ความสูงต่ำ (<500 ft)", "l2": 10, "l3": 15, "ra_max": 500, "unit": "deg" },
-    "HIGH_ROD_FINAL":       { "name": "High rate of descent below 1,000 ft RA", "th": "อัตราร่อนลงสูงช่วง final (<1000 ft)", "l2": 1200, "l3": 1500, "ra_max": 1000, "ra_min": 50, "min_s": 2, "unit": "fpm" },
-    "GPWS_WARNING":         { "name": "GPWS warning", "th": "สัญญาณเตือน GPWS", "l2": 1, "l3": 1, "unit": "discrete" },
-    "UNSTABLE_1000":        { "name": "Unstabilised approach at 1,000 ft", "th": "การบินเข้าไม่เสถียรที่ 1000 ft", "gate_ft": 1000, "level": 2 },
-    "UNSTABLE_500":         { "name": "Unstabilised approach at 500 ft", "th": "การบินเข้าไม่เสถียรที่ 500 ft (ควร go-around)", "gate_ft": 500, "level": 3 },
-    "GS_DEVIATION":         { "name": "Glideslope deviation below 1,000 ft", "th": "เบี่ยงเบน glideslope ต่ำกว่า 1000 ft", "l2": 1.0, "l3": 2.0, "ra_max": 1000, "ra_min": 200, "min_s": 2, "unit": "dot" },
-    "LOC_DEVIATION":        { "name": "Localiser deviation below 1,000 ft", "th": "เบี่ยงเบน localiser ต่ำกว่า 1000 ft", "l2": 1.0, "l3": 2.0, "ra_max": 1000, "ra_min": 50, "min_s": 2, "unit": "dot" },
-    "HARD_LANDING":         { "name": "Hard landing", "th": "ลงสนามแรง (hard landing)", "l2": 1.6, "l3": 1.8, "unit": "g" },
-    "LONG_LANDING":         { "name": "Long landing", "th": "แตะพื้นไกลเกินจากหัวรันเวย์", "l2": 900, "l3": 1200, "unit": "m from THR" },
-    "GO_AROUND":            { "name": "Go-around", "th": "บินวนขึ้นใหม่ (go-around)", "level": 1 }
+    "HIGH_PITCH_LIFTOFF": {
+      "name": "High pitch at lift-off",
+      "th": "มุมเงยสูงขณะยกตัว (เสี่ยงหางครูด)",
+      "l2": 9.5,
+      "l3": 10.5,
+      "unit": "deg"
+    },
+    "HIGH_PITCH_RATE_ROT": {
+      "name": "High pitch rate at rotation",
+      "th": "อัตราเงยหัวเร็วเกินขณะ rotate",
+      "l2": 3.5,
+      "l3": 4.5,
+      "unit": "deg/s"
+    },
+    "FLAP_OVERSPEED": {
+      "name": "Flap placard speed exceedance",
+      "th": "ความเร็วเกิน VFE ของแฟลป",
+      "l2": 0,
+      "l3": 5,
+      "min_s": 2,
+      "unit": "kt over VFE"
+    },
+    "SPEED_250_BELOW_FL100": {
+      "name": "IAS > 250 kt below 10,000 ft",
+      "th": "ความเร็วเกิน 250 kt ต่ำกว่า 10,000 ft",
+      "l2": 255,
+      "l3": 270,
+      "min_s": 5,
+      "unit": "kt"
+    },
+    "HIGH_BANK": {
+      "name": "High bank angle",
+      "th": "มุมเอียงสูง",
+      "l2": 33,
+      "l3": 40,
+      "unit": "deg"
+    },
+    "HIGH_BANK_LOW_ALT": {
+      "name": "High bank angle below 500 ft RA",
+      "th": "มุมเอียงสูงที่ความสูงต่ำ (<500 ft)",
+      "l2": 10,
+      "l3": 15,
+      "ra_max": 500,
+      "unit": "deg"
+    },
+    "HIGH_ROD_FINAL": {
+      "name": "High rate of descent below 1,000 ft RA",
+      "th": "อัตราร่อนลงสูงช่วง final (<1000 ft)",
+      "l2": 1200,
+      "l3": 1500,
+      "ra_max": 1000,
+      "ra_min": 50,
+      "min_s": 2,
+      "unit": "fpm"
+    },
+    "GPWS_WARNING": {
+      "name": "GPWS warning",
+      "th": "สัญญาณเตือน GPWS",
+      "l2": 1,
+      "l3": 1,
+      "unit": "discrete"
+    },
+    "UNSTABLE_1000": {
+      "name": "Unstabilised approach at 1,000 ft",
+      "th": "การบินเข้าไม่เสถียรที่ 1000 ft",
+      "gate_ft": 1000,
+      "level": 2
+    },
+    "UNSTABLE_500": {
+      "name": "Unstabilised approach at 500 ft",
+      "th": "การบินเข้าไม่เสถียรที่ 500 ft (ควร go-around)",
+      "gate_ft": 500,
+      "level": 3
+    },
+    "GS_DEVIATION": {
+      "name": "Glideslope deviation below 1,000 ft",
+      "th": "เบี่ยงเบน glideslope ต่ำกว่า 1000 ft",
+      "l2": 1.0,
+      "l3": 2.0,
+      "ra_max": 1000,
+      "ra_min": 200,
+      "min_s": 2,
+      "unit": "dot"
+    },
+    "LOC_DEVIATION": {
+      "name": "Localiser deviation below 1,000 ft",
+      "th": "เบี่ยงเบน localiser ต่ำกว่า 1000 ft",
+      "l2": 1.0,
+      "l3": 2.0,
+      "ra_max": 1000,
+      "ra_min": 50,
+      "min_s": 2,
+      "unit": "dot"
+    },
+    "HARD_LANDING": {
+      "name": "Hard landing",
+      "th": "ลงสนามแรง (hard landing)",
+      "l2": 1.6,
+      "l3": 1.8,
+      "unit": "g"
+    },
+    "LONG_LANDING": {
+      "name": "Long landing",
+      "th": "แตะพื้นไกลเกินจากหัวรันเวย์",
+      "l2": 900,
+      "l3": 1200,
+      "unit": "m from THR"
+    },
+    "GO_AROUND": {
+      "name": "Go-around",
+      "th": "บินวนขึ้นใหม่ (go-around)",
+      "level": 1
+    }
   },
   "unstable_criteria": {
     "ias_above_vapp_kt": 20,
@@ -26,5 +129,88 @@
     "landing_flap_min": 3,
     "loc_dev_dot": 1.0,
     "gs_dev_dot": 1.0
+  },
+  "gates_ft": [
+    1000,
+    500,
+    50
+  ],
+  "default_profile": "A320",
+  "profiles": {
+    "A320": {
+      "label": "A320-family jet (QAR/DAR export)",
+      "label_th": "เครื่องเจ็ตตระกูล A320"
+    },
+    "C172": {
+      "label": "Cessna 172 with G1000 (flight training)",
+      "label_th": "Cessna 172 (G1000) เครื่องฝึกบิน",
+      "vapp_default_kt": 65,
+      "fixed_gear": true,
+      "liftoff_ias_kt": 50,
+      "gates_ft": [
+        500,
+        300,
+        50
+      ],
+      "vfe_kt": {
+        "_replace": true,
+        "10": 110,
+        "20": 85,
+        "30": 85
+      },
+      "events": {
+        "HIGH_PITCH_LIFTOFF": {
+          "l2": 12,
+          "l3": 15
+        },
+        "HIGH_PITCH_RATE_ROT": {
+          "l2": 5,
+          "l3": 7
+        },
+        "SPEED_250_BELOW_FL100": {
+          "enabled": false
+        },
+        "HIGH_BANK": {
+          "l2": 50,
+          "l3": 60
+        },
+        "HIGH_BANK_LOW_ALT": {
+          "l2": 35,
+          "l3": 45,
+          "ra_max": 500
+        },
+        "HIGH_ROD_FINAL": {
+          "l2": 1000,
+          "l3": 1300,
+          "ra_max": 500,
+          "name": "High rate of descent below 500 ft AGL",
+          "th": "อัตราร่อนลงสูงช่วง final (<500 ft AGL)"
+        },
+        "UNSTABLE_1000": {
+          "gate_ft": 500,
+          "name": "Unstabilised approach at 500 ft AGL",
+          "th": "การบินเข้าไม่เสถียรที่ 500 ft AGL"
+        },
+        "UNSTABLE_500": {
+          "gate_ft": 300,
+          "name": "Unstabilised approach at 300 ft AGL",
+          "th": "การบินเข้าไม่เสถียรที่ 300 ft AGL (ควร go-around)"
+        },
+        "HARD_LANDING": {
+          "l2": 1.4,
+          "l3": 1.7
+        },
+        "LONG_LANDING": {
+          "l2": 350,
+          "l3": 550
+        }
+      },
+      "unstable_criteria": {
+        "ias_above_vapp_kt": 10,
+        "ias_below_vapp_kt": 5,
+        "vs_min_fpm": -1000,
+        "landing_flap_min": 0
+      }
+    }
   }
 }

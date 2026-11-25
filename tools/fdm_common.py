@@ -49,8 +49,32 @@ def load_airports() -> dict:
     return out
 
 
-def load_config() -> dict:
-    return json.loads((DATA / "events-config.json").read_text(encoding="utf-8"))
+def load_config(profile: str | None = None) -> dict:
+    return resolve_config(json.loads((DATA / "events-config.json").read_text(encoding="utf-8")), profile)
+
+
+def _strip(v):
+    return {k: x for k, x in v.items() if k != "_replace"} if isinstance(v, dict) else v
+
+
+def _merge(base, over):
+    if not isinstance(over, dict) or not isinstance(base, dict) or over.get("_replace"):
+        return _strip(over)
+    out = dict(base)
+    for k, v in over.items():
+        out[k] = _merge(base[k], v) if k in base else _strip(v)
+    return out
+
+
+def resolve_config(cfg: dict, profile: str | None = None) -> dict:
+    """Merge the aircraft-type profile (cfg['profiles'][name]) over the baseline. Mirrors js resolveConfig."""
+    name = profile or cfg.get("default_profile")
+    prof = (cfg.get("profiles") or {}).get(name) or {}
+    over = {k: v for k, v in prof.items() if k not in ("label", "label_th")}
+    out = _merge({k: v for k, v in cfg.items() if k != "profiles"}, over)
+    out["profile"] = name
+    out["profiles"] = cfg.get("profiles", {})
+    return out
 
 
 class Frame:
@@ -143,6 +167,38 @@ def find_runway(airports, lat, lon, hdg):
     return (best[0], best[1]) if best else (None, None)
 
 
+def go_arounds(rows, air):
+    """Indices of the lowest point of each go-around: descend below 1000 ft RA,
+    then climb 400 ft without touching down."""
+    n = len(rows)
+    gas = []
+    i = 1
+    while i < n:
+        if air[i] and _g(rows[i], "ra_ft") < 1000 and rows[i]["vs_fpm"] < 0:
+            jmin = i
+            j = i
+            while j < n and air[j]:
+                ra = _g(rows[j], "ra_ft")
+                if ra == ra and ra < _g(rows[jmin], "ra_ft"):
+                    jmin = j
+                if ra == ra and ra > _g(rows[jmin], "ra_ft") + 400 or (ra != ra and j > jmin):
+                    gas.append(jmin)
+                    break
+                j += 1
+            i = j + 1
+        else:
+            i += 1
+    return gas
+
+
+def gate_index(rows, end, prev, gate):
+    """Last row (searching back from `end` to `prev`) where RA crosses down through `gate`."""
+    for j in range(end, max(prev, 0), -1):
+        if _g(rows[j], "ra_ft") <= gate < _g(rows[j - 1], "ra_ft"):
+            return j
+    return None
+
+
 def detect_events(rows: list[dict], cfg: dict, airports: dict, vapp: float | None = None) -> list[dict]:
     E = cfg["events"]
     uc = cfg["unstable_criteria"]
@@ -158,6 +214,8 @@ def detect_events(rows: list[dict], cfg: dict, airports: dict, vapp: float | Non
 
     def ev(code, level, i0, i1, ipk, value, detail=""):
         d = E[code]
+        if d.get("enabled") is False:
+            return
         events.append(dict(code=code, level=level, name=d["name"], th=d["th"],
                            t_start=round(t[i0], 1), t_end=round(t[i1], 1), t_peak=round(t[ipk], 1),
                            value=None if value is None else round(value, 2), unit=d.get("unit", ""),
@@ -241,24 +299,7 @@ def detect_events(rows: list[dict], cfg: dict, airports: dict, vapp: float | Non
                 v = abs(rows[ipk][col])
                 ev(code, level_of(code, v), i0, i1, ipk, v, f"{rows[ipk][col]:+.2f} dot at RA {rows[ipk]['ra_ft']:.0f} ft")
 
-    # go-arounds: descend below 1000 ft RA, then climb 400 ft without touching down
-    gas = []
-    i = 1
-    while i < n:
-        if air[i] and _g(rows[i], "ra_ft") < 1000 and rows[i]["vs_fpm"] < 0:
-            jmin = i
-            j = i
-            while j < n and air[j]:
-                ra = _g(rows[j], "ra_ft")
-                if ra == ra and ra < _g(rows[jmin], "ra_ft"):
-                    jmin = j
-                if ra == ra and ra > _g(rows[jmin], "ra_ft") + 400 or (ra != ra and j > jmin):
-                    gas.append(jmin)
-                    break
-                j += 1
-            i = j + 1
-        else:
-            i += 1
+    gas = go_arounds(rows, air)
     for g in gas:
         ev("GO_AROUND", 1, g, g, g, rows[g]["ra_ft"], f"minimum RA {rows[g]['ra_ft']:.0f} ft")
 
@@ -268,11 +309,7 @@ def detect_events(rows: list[dict], cfg: dict, airports: dict, vapp: float | Non
         prev = max([m for m in marks if m < end], default=0)
         for code in ("UNSTABLE_1000", "UNSTABLE_500"):
             gate = E[code]["gate_ft"]
-            gi = None
-            for j in range(end, max(prev, 0), -1):
-                if _g(rows[j], "ra_ft") <= gate < _g(rows[j - 1], "ra_ft"):
-                    gi = j
-                    break
+            gi = gate_index(rows, end, prev, gate)
             if gi is None:
                 continue
             r = dict(rows[gi])
@@ -330,4 +367,72 @@ def flight_summary(rows: list[dict], airports: dict) -> dict:
             item = dict(t=r["time_s"], rwy=f"{rwy['icao']} {rwy['id']}" if rwy else "?",
                         along_m=round(along) if along is not None else None, ias_kt=round(r["ias_kt"]))
             (out["takeoffs"] if air[i] else out["landings"]).append(item)
+    return out
+
+
+# ---------------------------------------------------------------- routine measurements
+def _r(v, nd=1):
+    """Round, mapping NaN/None to None (JSON null). Mirrors js rnd()."""
+    if v is None or v != v:
+        return None
+    k = 10 ** nd
+    return math.floor(v * k + 0.5) / k   # half-up like JS Math.round
+
+
+def measurements(rows: list[dict], cfg: dict, airports: dict, vapp: float | None = None) -> dict:
+    """Doc 10000 'routine measurements': values kept for EVERY flight (not only
+    exceedances) so distributions and trends can be watched before thresholds trip.
+    Mirrors js FDM.measurements()."""
+    vapp = vapp or cfg["vapp_default_kt"]
+    gates = cfg.get("gates_ft", [1000, 500, 50])
+    n = len(rows)
+    out = dict(landings=[], takeoffs=[], flight={})
+    if n < 3:
+        return out
+    t = [r["time_s"] for r in rows]
+    dt = (t[-1] - t[0]) / (n - 1)
+    air = [(_g(r, "air_ground") >= 0.5) for r in rows]
+    liftoffs = [i for i in range(1, n) if air[i] and not air[i - 1]]
+    touchdowns = [i for i in range(1, n) if not air[i] and air[i - 1]]
+    gas = go_arounds(rows, air)
+    marks = sorted(touchdowns + gas + liftoffs)
+
+    for td in touchdowns:
+        prev = max([m for m in marks if m < td], default=0)
+        j0, j1 = max(0, td - int(1 / dt)), min(n - 1, td + int(3 / dt))
+        k0 = max(prev, td - int(3 / dt))
+        rwy, along = find_runway(airports, rows[td]["lat"], rows[td]["lon"], rows[td]["hdg_true_deg"])
+        m = dict(t=_r(t[td]), rwy=f"{rwy['icao']} {rwy['id']}" if rwy else None,
+                 td_nz_g=_r(max(rows[j]["nz_g"] for j in range(j0, j1 + 1)), 3),
+                 td_vs_fpm=_r(rows[td - 1]["vs_fpm"], 0),
+                 td_pitch_deg=_r(rows[td]["pitch_deg"], 2),
+                 td_roll_max_deg=_r(max(abs(rows[k]["roll_deg"]) for k in range(k0, td + 1)), 2),
+                 td_ias_kt=_r(rows[td]["ias_kt"]),
+                 td_dist_m=_r(along, 0) if rwy else None)
+        for gate in gates:
+            gi = gate_index(rows, td, prev, gate)
+            if gi is None:
+                m[f"ias_dev_{gate}"] = m[f"vs_{gate}"] = m[f"gs_dev_{gate}"] = None
+                continue
+            w = rows[max(0, gi - 2): gi + 3]
+            m[f"ias_dev_{gate}"] = _r(sum(x["ias_kt"] for x in w) / len(w) - vapp)
+            m[f"vs_{gate}"] = _r(sum(x["vs_fpm"] for x in w) / len(w), 0)
+            m[f"gs_dev_{gate}"] = _r(_g(rows[gi], "gs_dev_dot"), 2)
+        rod = [-rows[k]["vs_fpm"] for k in range(prev, td) if 50 < _g(rows[k], "ra_ft") < gates[0]]
+        m["max_rod_final_fpm"] = _r(max(rod), 0) if rod else None
+        out["landings"].append(m)
+
+    for lo in liftoffs:
+        j0 = max(1, lo - int(10 / dt))
+        j1 = min(n - 2, lo + int(3 / dt))
+        prs = [(rows[j + 1]["pitch_deg"] - rows[j - 1]["pitch_deg"]) / (t[j + 1] - t[j - 1]) for j in range(j0, j1 + 1)]
+        rwy, _ = find_runway(airports, rows[lo]["lat"], rows[lo]["lon"], rows[lo]["hdg_true_deg"])
+        out["takeoffs"].append(dict(t=_r(t[lo]), rwy=f"{rwy['icao']} {rwy['id']}" if rwy else None,
+                                    lo_pitch_deg=_r(rows[lo]["pitch_deg"], 2), lo_ias_kt=_r(rows[lo]["ias_kt"]),
+                                    max_pitch_rate=_r(max(prs), 2) if prs else None))
+
+    airborne = [abs(r["roll_deg"]) for r, a in zip(rows, air) if a]
+    out["flight"] = dict(duration_s=_r(t[-1] - t[0]), max_alt_ft=_r(max(r["alt_ft"] for r in rows), 0),
+                         max_bank_deg=_r(max(airborne), 1) if airborne else None,
+                         n_takeoffs=len(liftoffs), n_landings=len(touchdowns), n_go_arounds=len(gas))
     return out

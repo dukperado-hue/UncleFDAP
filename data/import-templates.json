@@ -1,0 +1,72 @@
+{
+  "_comment": "Column-mapping templates for the import wizard (js/importer.js). 'src' lists candidate source column names (first match wins, compared case/space-insensitively). 'unit' is the source unit; omit it to infer from the units row. Users can save their own templates in the browser or download them as JSON.",
+  "templates": [
+    {
+      "id": "fdm-replay",
+      "name": "FDM Replay native CSV",
+      "name_th": "CSV รูปแบบของ FDM Replay",
+      "detect": ["time_s", "lat", "lon", "alt_ft", "ias_kt"],
+      "profile": "A320",
+      "time": { "mode": "seconds", "col": "time_s", "unit": "s", "utc": "utc" },
+      "columns": {
+        "lat": { "src": ["lat"] }, "lon": { "src": ["lon"] }, "alt_ft": { "src": ["alt_ft"], "unit": "ft" },
+        "ra_ft": { "src": ["ra_ft"], "unit": "ft" }, "ias_kt": { "src": ["ias_kt"], "unit": "kt" },
+        "tas_kt": { "src": ["tas_kt"], "unit": "kt" }, "gs_kt": { "src": ["gs_kt"], "unit": "kt" },
+        "mach": { "src": ["mach"] }, "vs_fpm": { "src": ["vs_fpm"], "unit": "fpm" },
+        "pitch_deg": { "src": ["pitch_deg"], "unit": "deg" }, "roll_deg": { "src": ["roll_deg"], "unit": "deg" },
+        "hdg_true_deg": { "src": ["hdg_true_deg"], "unit": "deg" }, "hdg_mag_deg": { "src": ["hdg_mag_deg"], "unit": "deg" },
+        "trk_true_deg": { "src": ["trk_true_deg"], "unit": "deg" }, "aoa_deg": { "src": ["aoa_deg"], "unit": "deg" },
+        "nz_g": { "src": ["nz_g"], "unit": "g" }, "flap": { "src": ["flap"] }, "gear": { "src": ["gear"] },
+        "n1_1": { "src": ["n1_1"] }, "n1_2": { "src": ["n1_2"] }, "ap": { "src": ["ap"] }, "athr": { "src": ["athr"] },
+        "loc_dev_dot": { "src": ["loc_dev_dot"], "unit": "dot" }, "gs_dev_dot": { "src": ["gs_dev_dot"], "unit": "dot" },
+        "wind_dir_deg": { "src": ["wind_dir_deg"], "unit": "deg" }, "wind_spd_kt": { "src": ["wind_spd_kt"], "unit": "kt" },
+        "sat_c": { "src": ["sat_c"] }, "air_ground": { "src": ["air_ground"], "unit": "bool" },
+        "gpws_warn": { "src": ["gpws_warn"], "unit": "bool" }, "rev": { "src": ["rev"] }, "phase": { "src": ["phase"] }
+      }
+    },
+    {
+      "id": "g1000",
+      "name": "Garmin G1000 / G3000 / G3X data log",
+      "name_th": "ไฟล์บันทึกข้อมูล Garmin G1000 / G3000 / G3X (SD card)",
+      "detect": ["Lcl Date", "Lcl Time", "AltMSL", "IAS", "Pitch", "Roll"],
+      "profile": "C172",
+      "time": { "mode": "datetime", "date": "Lcl Date", "time": "Lcl Time", "offset": "UTCOfst" },
+      "columns": {
+        "lat": { "src": ["Latitude"], "unit": "deg" }, "lon": { "src": ["Longitude"], "unit": "deg" },
+        "alt_ft": { "src": ["AltMSL", "AltB"], "unit": "ft" }, "alt_gps_ft": { "src": ["AltGPS"], "unit": "ft" },
+        "ias_kt": { "src": ["IAS"], "unit": "kt" }, "tas_kt": { "src": ["TAS"], "unit": "kt" },
+        "gs_kt": { "src": ["GndSpd"], "unit": "kt" }, "vs_fpm": { "src": ["VSpd"], "unit": "fpm" },
+        "pitch_deg": { "src": ["Pitch"], "unit": "deg" }, "roll_deg": { "src": ["Roll"], "unit": "deg" },
+        "hdg_mag_deg": { "src": ["HDG"], "unit": "deg" }, "trk_mag_deg": { "src": ["TRK"], "unit": "deg" },
+        "magvar_deg": { "src": ["MagVar"], "unit": "deg" },
+        "nz_g": { "src": ["NormAc"], "unit": "g-auto" },
+        "wind_spd_kt": { "src": ["WndSpd"], "unit": "kt" }, "wind_dir_mag_deg": { "src": ["WndDr"], "unit": "deg" },
+        "sat_c": { "src": ["OAT"], "unit": "degC" }, "rpm_1": { "src": ["E1 RPM"] },
+        "fuel_l": { "src": ["FQtyL"] }, "fuel_r": { "src": ["FQtyR"] },
+        "gps_fix": { "src": ["GPSfix"], "unit": "text" }, "ap": { "src": ["AfcsOn"], "unit": "bool" }
+      }
+    },
+    {
+      "id": "operator-mnemonic",
+      "name": "Decoder export with FDM mnemonics (ALT_STD, CAS, VRTG ...)",
+      "name_th": "ไฟล์ส่งออกจาก decoder ใช้ชื่อพารามิเตอร์แบบย่อ (ALT_STD, CAS, VRTG ...)",
+      "detect": ["ALT_STD", "CAS", "VRTG"],
+      "profile": "A320",
+      "time": { "mode": "seconds", "col": "FRAME_TIME", "unit": "s", "timeofday": "GMT" },
+      "columns": {
+        "lat": { "src": ["LATP", "LAT", "LATPC"], "unit": "deg" }, "lon": { "src": ["LONP", "LONG", "LONPC"], "unit": "deg" },
+        "alt_ft": { "src": ["ALT_STD", "ALT_QNH", "ALTITUDE"], "unit": "ft" }, "ra_ft": { "src": ["RALT", "RALT1", "RAD_ALT"], "unit": "ft" },
+        "ias_kt": { "src": ["CAS", "IAS", "VCAS"], "unit": "kt" }, "tas_kt": { "src": ["TAS"], "unit": "kt" },
+        "gs_kt": { "src": ["GS", "GSPD"], "unit": "kt" }, "vs_fpm": { "src": ["IVV", "VRTSPD", "ALT_RATE"], "unit": "fpm" },
+        "pitch_deg": { "src": ["PITCH", "PTCH"], "unit": "deg" }, "roll_deg": { "src": ["ROLL"], "unit": "deg" },
+        "hdg_true_deg": { "src": ["HEAD_TRUE", "TH"], "unit": "deg" }, "hdg_mag_deg": { "src": ["HEAD_MAG", "HEAD"], "unit": "deg" },
+        "nz_g": { "src": ["VRTG", "NZ"], "unit": "g" }, "flap": { "src": ["FLAP_LEVER", "FLAPC", "CONF"] },
+        "gear": { "src": ["LDG_SEL_DN", "LDGDN", "GEAR_DN"], "unit": "bool" }, "ap": { "src": ["AP_ENGAGED", "AP1", "AP"], "unit": "bool" },
+        "n1_1": { "src": ["N11", "N1_1"] }, "n1_2": { "src": ["N12", "N1_2"] },
+        "loc_dev_dot": { "src": ["LOC_DEV", "LOCDEV", "DLOC"], "unit": "dot" }, "gs_dev_dot": { "src": ["GS_DEV", "GLIDE_DEV", "DGS"], "unit": "dot" },
+        "air_ground": { "src": ["WOW", "GND_AIR", "SQUAT"], "unit": "bool-inv" },
+        "gpws_warn": { "src": ["GPWS_SINK", "GPWS"], "unit": "bool" }, "sat_c": { "src": ["SAT"], "unit": "degC" }
+      }
+    }
+  ]
+}

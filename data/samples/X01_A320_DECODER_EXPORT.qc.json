@@ -1,0 +1,336 @@
+{
+ "score": 100,
+ "verdict": "usable",
+ "checks": [
+  {
+   "id": "rate",
+   "sev": "ok",
+   "en": "sample rate 2.0 Hz (0.50 s), 1184 rows, 9:51",
+   "th": "อัตราสุ่ม 2.00 Hz, 1184 แถว, ยาว 9:51",
+   "value": 2
+  },
+  {
+   "id": "gaps",
+   "sev": "ok",
+   "en": "no recording gaps — data recovery 100 %",
+   "th": "ไม่มีช่วงข้อมูลขาด",
+   "value": 1,
+   "gaps": []
+  },
+  {
+   "id": "ops",
+   "sev": "ok",
+   "en": "0 take-off(s), 1 landing(s) detected",
+   "th": "พบการขึ้น 0 ครั้ง ลงจอด 1 ครั้ง"
+  },
+  {
+   "id": "derived_trk_true_deg",
+   "sev": "info",
+   "en": "derived trk_true_deg: ground track computed from successive positions",
+   "th": "สร้างค่า trk_true_deg: คำนวณ track จากตำแหน่งต่อเนื่อง"
+  },
+  {
+   "id": "derived_phase",
+   "sev": "info",
+   "en": "derived phase: flight phase derived from air/ground, vertical speed and height",
+   "th": "สร้างค่า phase: ช่วงการบินคำนวณจากสถานะอากาศ/พื้น อัตราไต่ และความสูง"
+  }
+ ],
+ "stats": [
+  {
+   "key": "lat",
+   "src": "LATP",
+   "unit": "deg",
+   "coverage": 1,
+   "min": 13.899,
+   "max": 14.253,
+   "out": 0,
+   "frozen_s": 0,
+   "frozen_t": null,
+   "spikes": 0
+  },
+  {
+   "key": "lon",
+   "src": "LONP",
+   "unit": "deg",
+   "coverage": 1,
+   "min": 100.5968,
+   "max": 100.9559,
+   "out": 0,
+   "frozen_s": 0,
+   "frozen_t": null,
+   "spikes": 0
+  },
+  {
+   "key": "alt_ft",
+   "src": "ALT_STD",
+   "unit": "ft",
+   "coverage": 1,
+   "min": 1.7,
+   "max": 7002.5,
+   "out": 0,
+   "frozen_s": 0.5,
+   "frozen_t": 173.5,
+   "spikes": 0
+  },
+  {
+   "key": "ias_kt",
+   "src": "CAS",
+   "unit": "kt",
+   "coverage": 1,
+   "min": 35.9,
+   "max": 250.1,
+   "out": 0,
+   "frozen_s": 1,
+   "frozen_t": 83,
+   "spikes": 0
+  },
+  {
+   "key": "pitch_deg",
+   "src": "PITCH",
+   "unit": "deg",
+   "coverage": 1,
+   "min": -1.49,
+   "max": 4.52,
+   "out": 0,
+   "frozen_s": 1,
+   "frozen_t": 341.5,
+   "spikes": 0
+  },
+  {
+   "key": "roll_deg",
+   "src": "ROLL",
+   "unit": "deg",
+   "coverage": 1,
+   "min": -11.19,
+   "max": 3.42,
+   "out": 0,
+   "frozen_s": 0.5,
+   "frozen_t": 39,
+   "spikes": 0
+  },
+  {
+   "key": "hdg_true_deg",
+   "src": "HEAD_TRUE",
+   "unit": "deg",
+   "coverage": 1,
+   "min": 208.68000000000006,
+   "max": 239,
+   "out": 0,
+   "frozen_s": 0,
+   "frozen_t": null,
+   "spikes": 0
+  },
+  {
+   "key": "hdg_mag_deg",
+   "src": "HEAD_MAG",
+   "unit": "deg",
+   "coverage": 1,
+   "min": 209.38,
+   "max": 239.70000000000005,
+   "out": 0,
+   "frozen_s": 0,
+   "frozen_t": null,
+   "spikes": 0
+  },
+  {
+   "key": "trk_true_deg",
+   "src": "derived",
+   "coverage": 1,
+   "min": 180,
+   "max": 245.376684279509,
+   "out": 0,
+   "frozen_s": 0,
+   "frozen_t": null,
+   "spikes": 0
+  },
+  {
+   "key": "ra_ft",
+   "src": "RALT",
+   "unit": "ft",
+   "coverage": 0.39864864864864863,
+   "min": 0,
+   "max": 2497.4,
+   "out": 0,
+   "frozen_s": 0,
+   "frozen_t": null,
+   "spikes": 0
+  },
+  {
+   "key": "gs_kt",
+   "src": "GS",
+   "unit": "kt",
+   "coverage": 1,
+   "min": 30,
+   "max": 273.9,
+   "out": 0,
+   "frozen_s": 0,
+   "frozen_t": null,
+   "spikes": 0
+  },
+  {
+   "key": "tas_kt",
+   "src": "TAS",
+   "unit": "kt",
+   "coverage": 1,
+   "min": 35.9,
+   "max": 285,
+   "out": 0,
+   "frozen_s": 0,
+   "frozen_t": null,
+   "spikes": 0
+  },
+  {
+   "key": "vs_fpm",
+   "src": "IVV",
+   "unit": "fpm",
+   "coverage": 1,
+   "min": -1450,
+   "max": 0,
+   "out": 0,
+   "frozen_s": 0,
+   "frozen_t": null,
+   "spikes": 0
+  },
+  {
+   "key": "nz_g",
+   "src": "VRTG",
+   "unit": "g",
+   "coverage": 1,
+   "min": 0.751,
+   "max": 1.277,
+   "out": 0,
+   "frozen_s": 0,
+   "frozen_t": null,
+   "spikes": 0
+  },
+  {
+   "key": "flap",
+   "src": "FLAP_LEVER",
+   "unit": "",
+   "coverage": 1,
+   "min": 0,
+   "max": 3,
+   "out": 0,
+   "frozen_s": 0,
+   "frozen_t": null,
+   "spikes": 0
+  },
+  {
+   "key": "gear",
+   "src": "LDG_SEL_DN",
+   "unit": "bool",
+   "coverage": 1,
+   "min": 0,
+   "max": 1,
+   "out": 0,
+   "frozen_s": 0,
+   "frozen_t": null,
+   "spikes": 0
+  },
+  {
+   "key": "air_ground",
+   "src": "WOW",
+   "unit": "bool-inv",
+   "coverage": 1,
+   "min": 0,
+   "max": 1,
+   "out": 0,
+   "frozen_s": 0,
+   "frozen_t": null,
+   "spikes": 0
+  },
+  {
+   "key": "ap",
+   "src": "AP_ENGAGED",
+   "unit": "bool",
+   "coverage": 1,
+   "min": 0,
+   "max": 1,
+   "out": 0,
+   "frozen_s": 0,
+   "frozen_t": null,
+   "spikes": 0
+  },
+  {
+   "key": "n1_1",
+   "src": "N11",
+   "unit": "",
+   "coverage": 1,
+   "min": 25.6,
+   "max": 80.7,
+   "out": 0,
+   "frozen_s": 0,
+   "frozen_t": null,
+   "spikes": 0
+  },
+  {
+   "key": "n1_2",
+   "src": "N12",
+   "unit": "",
+   "coverage": 1,
+   "min": 25.7,
+   "max": 80.5,
+   "out": 0,
+   "frozen_s": 0,
+   "frozen_t": null,
+   "spikes": 0
+  },
+  {
+   "key": "loc_dev_dot",
+   "src": "LOC_DEV",
+   "unit": "dot",
+   "coverage": 0.870777027027027,
+   "min": -2.5,
+   "max": 0.001,
+   "out": 0,
+   "frozen_s": 0,
+   "frozen_t": null,
+   "spikes": 0
+  },
+  {
+   "key": "gs_dev_dot",
+   "src": "GS_DEV",
+   "unit": "dot",
+   "coverage": 0.84375,
+   "min": -2.5,
+   "max": 0.404,
+   "out": 0,
+   "frozen_s": 0,
+   "frozen_t": null,
+   "spikes": 0
+  },
+  {
+   "key": "sat_c",
+   "src": "SAT",
+   "unit": "degC",
+   "coverage": 1,
+   "min": 16,
+   "max": 30,
+   "out": 0,
+   "frozen_s": 0,
+   "frozen_t": null,
+   "spikes": 0
+  },
+  {
+   "key": "gpws_warn",
+   "src": "GPWS_SINK",
+   "unit": "bool",
+   "coverage": 1,
+   "min": 0,
+   "max": 0,
+   "out": 0,
+   "frozen_s": 0,
+   "frozen_t": null,
+   "spikes": 0
+  }
+ ],
+ "template": "operator-mnemonic",
+ "profile": "A320",
+ "layout": {
+  "header": 0,
+  "units": 1,
+  "columns": 25,
+  "meta": {}
+ }
+}

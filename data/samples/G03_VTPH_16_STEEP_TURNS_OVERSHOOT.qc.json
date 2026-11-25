@@ -1,0 +1,391 @@
+{
+ "score": 97,
+ "verdict": "usable",
+ "checks": [
+  {
+   "id": "rate",
+   "sev": "ok",
+   "en": "sample rate 1.00 Hz (1.00 s), 1106 rows, 18:25",
+   "th": "อัตราสุ่ม 1.00 Hz, 1106 แถว, ยาว 18:25",
+   "value": 1
+  },
+  {
+   "id": "nz_rate",
+   "sev": "warn",
+   "en": "vertical acceleration at ≤ 1 Hz under-samples the touchdown peak (Airbus FDA guidance: record it at a high rate) — treat touchdown g as indicative only",
+   "th": "ค่าแรง G ที่ ≤ 1 Hz จับค่าสูงสุดตอนแตะพื้นได้ไม่ครบ ให้ใช้ค่า touchdown g เป็นค่าประมาณ"
+  },
+  {
+   "id": "gaps",
+   "sev": "ok",
+   "en": "no recording gaps — data recovery 100 %",
+   "th": "ไม่มีช่วงข้อมูลขาด",
+   "value": 1,
+   "gaps": []
+  },
+  {
+   "id": "datum",
+   "sev": "ok",
+   "en": "on-ground altitude vs runway elevation: median -0 ft",
+   "th": "ความสูงขณะอยู่บนพื้นเทียบระดับรันเวย์: -0 ft",
+   "value": -0.006326233301145123
+  },
+  {
+   "id": "gpsalt",
+   "sev": "ok",
+   "en": "GPS altitude − baro altitude: median -89 ft (geoid separation + QNH; not used)",
+   "th": "ความต่าง GPS altitude − baro: -89 ft (ไม่ได้ใช้)"
+  },
+  {
+   "id": "ops",
+   "sev": "ok",
+   "en": "2 take-off(s), 2 landing(s) detected",
+   "th": "พบการขึ้น 2 ครั้ง ลงจอด 2 ครั้ง"
+  },
+  {
+   "id": "derived_nz_g",
+   "sev": "info",
+   "en": "derived nz_g: recorded acceleration is centred on 0 g (median 0.00): treated as deviation from 1 g, +1 g applied",
+   "th": "สร้างค่า nz_g: ค่าแรง G บันทึกเป็นส่วนเบี่ยงจาก 1 g จึงบวก 1 g"
+  },
+  {
+   "id": "derived_ra_ft",
+   "sev": "info",
+   "en": "derived ra_ft: no radio altimeter: height = altitude − runway/aerodrome elevation from AIP (sloped runway interpolated)",
+   "th": "สร้างค่า ra_ft: ไม่มี radio altimeter: ใช้ความสูงเหนือสนาม = altitude − ระดับรันเวย์ตาม AIP"
+  },
+  {
+   "id": "derived_air_ground",
+   "sev": "info",
+   "en": "derived air_ground: air/ground derived from airspeed (≥ 50 kt) and height (> 15 ft airborne, ≤ 5 ft on ground) — no weight-on-wheels",
+   "th": "สร้างค่า air_ground: สถานะอากาศ/พื้นคำนวณจากความเร็วและความสูง (ไม่มีสัญญาณ WOW)"
+  },
+  {
+   "id": "derived_gear",
+   "sev": "info",
+   "en": "derived gear: fixed landing gear: gear = down",
+   "th": "สร้างค่า gear: ฐานล้อตายตัว: gear = down"
+  },
+  {
+   "id": "derived_phase",
+   "sev": "info",
+   "en": "derived phase: flight phase derived from air/ground, vertical speed and height",
+   "th": "สร้างค่า phase: ช่วงการบินคำนวณจากสถานะอากาศ/พื้น อัตราไต่ และความสูง"
+  }
+ ],
+ "stats": [
+  {
+   "key": "lat",
+   "src": "Latitude",
+   "unit": "deg",
+   "coverage": 1,
+   "min": 12.5672817,
+   "max": 12.6617418,
+   "out": 0,
+   "frozen_s": 0,
+   "frozen_t": null,
+   "spikes": 0
+  },
+  {
+   "key": "lon",
+   "src": "Longitude",
+   "unit": "deg",
+   "coverage": 1,
+   "min": 99.9409574,
+   "max": 100.0370204,
+   "out": 0,
+   "frozen_s": 0,
+   "frozen_t": null,
+   "spikes": 0
+  },
+  {
+   "key": "alt_ft",
+   "src": "AltMSL",
+   "unit": "ft",
+   "coverage": 1,
+   "min": 46.9,
+   "max": 3066.4,
+   "out": 0,
+   "frozen_s": 1,
+   "frozen_t": 188,
+   "spikes": 0
+  },
+  {
+   "key": "ias_kt",
+   "src": "IAS",
+   "unit": "kt",
+   "coverage": 1,
+   "min": 0,
+   "max": 99.8,
+   "out": 0,
+   "frozen_s": 2,
+   "frozen_t": 364,
+   "spikes": 0
+  },
+  {
+   "key": "pitch_deg",
+   "src": "Pitch",
+   "unit": "deg",
+   "coverage": 1,
+   "min": -3.6,
+   "max": 13.04,
+   "out": 0,
+   "frozen_s": 1,
+   "frozen_t": 61,
+   "spikes": 0
+  },
+  {
+   "key": "roll_deg",
+   "src": "Roll",
+   "unit": "deg",
+   "coverage": 1,
+   "min": -57.61,
+   "max": 62.44,
+   "out": 0,
+   "frozen_s": 1,
+   "frozen_t": 863,
+   "spikes": 0
+  },
+  {
+   "key": "hdg_true_deg",
+   "src": "HDG",
+   "unit": "deg",
+   "coverage": 1,
+   "min": 1.6499999999999773,
+   "max": 356.1,
+   "out": 0,
+   "frozen_s": 0,
+   "frozen_t": null,
+   "spikes": 0
+  },
+  {
+   "key": "hdg_mag_deg",
+   "src": "HDG",
+   "unit": "deg",
+   "coverage": 1,
+   "min": 1.6499999999999773,
+   "max": 356.1,
+   "out": 0,
+   "frozen_s": 0,
+   "frozen_t": null,
+   "spikes": 0
+  },
+  {
+   "key": "trk_mag_deg",
+   "src": "TRK",
+   "unit": "deg",
+   "coverage": 1,
+   "min": 0.2300000000000182,
+   "max": 359.28999999999996,
+   "out": 0,
+   "frozen_s": 0,
+   "frozen_t": null,
+   "spikes": 0
+  },
+  {
+   "key": "magvar_deg",
+   "src": "MagVar",
+   "unit": "deg",
+   "coverage": 1,
+   "min": -0.6,
+   "max": -0.6,
+   "out": 0,
+   "frozen_s": 0,
+   "frozen_t": null,
+   "spikes": 0
+  },
+  {
+   "key": "ra_ft",
+   "src": "derived",
+   "coverage": 0.8526220614828209,
+   "min": 0,
+   "max": 2496.7,
+   "out": 0,
+   "frozen_s": 0,
+   "frozen_t": null,
+   "spikes": 0
+  },
+  {
+   "key": "alt_gps_ft",
+   "src": "AltGPS",
+   "unit": "ft",
+   "coverage": 1,
+   "min": -60,
+   "max": 2980.8,
+   "out": 0,
+   "frozen_s": 0,
+   "frozen_t": null,
+   "spikes": 0
+  },
+  {
+   "key": "gs_kt",
+   "src": "GndSpd",
+   "unit": "kt",
+   "coverage": 1,
+   "min": 0,
+   "max": 110.32,
+   "out": 0,
+   "frozen_s": 0,
+   "frozen_t": null,
+   "spikes": 0
+  },
+  {
+   "key": "tas_kt",
+   "src": "TAS",
+   "unit": "kt",
+   "coverage": 1,
+   "min": 0,
+   "max": 100.82,
+   "out": 0,
+   "frozen_s": 0,
+   "frozen_t": null,
+   "spikes": 0
+  },
+  {
+   "key": "vs_fpm",
+   "src": "VSpd",
+   "unit": "fpm",
+   "coverage": 1,
+   "min": -722.27,
+   "max": 731.48,
+   "out": 0,
+   "frozen_s": 0,
+   "frozen_t": null,
+   "spikes": 0
+  },
+  {
+   "key": "nz_g",
+   "src": "NormAc",
+   "unit": "g-auto",
+   "coverage": 1,
+   "min": 0.89,
+   "max": 2.1,
+   "out": 0,
+   "frozen_s": 0,
+   "frozen_t": null,
+   "spikes": 0
+  },
+  {
+   "key": "gear",
+   "src": "derived",
+   "coverage": 1,
+   "min": 1,
+   "max": 1,
+   "out": 0,
+   "frozen_s": 0,
+   "frozen_t": null,
+   "spikes": 0
+  },
+  {
+   "key": "air_ground",
+   "src": "derived",
+   "coverage": 1,
+   "min": 0,
+   "max": 1,
+   "out": 0,
+   "frozen_s": 0,
+   "frozen_t": null,
+   "spikes": 0
+  },
+  {
+   "key": "ap",
+   "src": "AfcsOn",
+   "unit": "bool",
+   "coverage": 1,
+   "min": 0,
+   "max": 0,
+   "out": 0,
+   "frozen_s": 0,
+   "frozen_t": null,
+   "spikes": 0
+  },
+  {
+   "key": "rpm_1",
+   "src": "E1 RPM",
+   "unit": "",
+   "coverage": 1,
+   "min": 850,
+   "max": 2350,
+   "out": 0,
+   "frozen_s": 0,
+   "frozen_t": null,
+   "spikes": 0
+  },
+  {
+   "key": "wind_dir_mag_deg",
+   "src": "WndDr",
+   "unit": "deg",
+   "coverage": 1,
+   "min": 150.60000000000002,
+   "max": 150.60000000000002,
+   "out": 0,
+   "frozen_s": 0,
+   "frozen_t": null,
+   "spikes": 0
+  },
+  {
+   "key": "wind_spd_kt",
+   "src": "WndSpd",
+   "unit": "kt",
+   "coverage": 1,
+   "min": 7,
+   "max": 9.6,
+   "out": 0,
+   "frozen_s": 0,
+   "frozen_t": null,
+   "spikes": 0
+  },
+  {
+   "key": "sat_c",
+   "src": "OAT",
+   "unit": "degC",
+   "coverage": 1,
+   "min": 22.9,
+   "max": 28.9,
+   "out": 0,
+   "frozen_s": 0,
+   "frozen_t": null,
+   "spikes": 0
+  },
+  {
+   "key": "fuel_l",
+   "src": "FQtyL",
+   "unit": "",
+   "coverage": 1,
+   "min": 22.78,
+   "max": 24,
+   "out": 0,
+   "frozen_s": 0,
+   "frozen_t": null,
+   "spikes": 0
+  },
+  {
+   "key": "fuel_r",
+   "src": "FQtyR",
+   "unit": "",
+   "coverage": 1,
+   "min": 22.78,
+   "max": 24,
+   "out": 0,
+   "frozen_s": 0,
+   "frozen_t": null,
+   "spikes": 0
+  }
+ ],
+ "template": "g1000",
+ "profile": "C172",
+ "layout": {
+  "header": 2,
+  "units": 1,
+  "columns": 64,
+  "meta": {
+   "log_version": "1.00",
+   "airframe_name": "Cessna 172S",
+   "unit_software_part_number": "006-B0000-00",
+   "unit_software_version": "0.00",
+   "system_software_part_number": "006-B0000-00",
+   "system_id": "SYNTHETIC",
+   "mode": "NORMAL"
+  }
+ }
+}

@@ -1,5 +1,5 @@
 {
-  "source": "AIP Thailand (CAAT eAIP), AIRAC 2026-10-29, AD 2.2 / AD 2.12 / AD 2.19",
+  "source": "AIP Thailand (CAAT eAIP), AIRAC 2026-10-29, AD 2.2 / AD 2.12 / AD 2.19 (VTBS, VTBD); AD 2.2 / AD 2.12 (VTPH)",
   "source_url": "https://aip.caat.or.th/2026-10-29-AIRAC/html/index-en-GB.html",
   "note": "Values transcribed from the eAIP. For demonstration only - NOT for navigation.",
   "airports": {
@@ -29,6 +29,18 @@
         { "id": "21R", "pair": "03L", "true_brg": 209.00, "length_m": 3700, "width_m": 60, "thr": "135534.87N 1003644.62E", "thr_elev_ft": 7, "ils_loc_mhz": 109.3, "gp_deg": 3.0 },
         { "id": "03R", "pair": "21L", "true_brg": 28.00, "length_m": 3500, "width_m": 45, "thr": "135358.45N 1003605.50E", "thr_elev_ft": 5, "ils_loc_mhz": null, "gp_deg": 3.0 },
         { "id": "21L", "pair": "03R", "true_brg": 208.00, "length_m": 3500, "width_m": 45, "thr": "135528.33N 1003655.97E", "thr_elev_ft": 6, "ils_loc_mhz": 110.3, "gp_deg": 3.0 }
+      ]
+    },
+    "VTPH": {
+      "name": "Hua Hin",
+      "arp": "123749N 0995712E",
+      "elev_ft": 62,
+      "geoid_undulation_m": -27,
+      "magvar_deg": -0.6,
+      "note": "AD 2.12 extract gives length 2100 m but no width; 45 m is an assumption for drawing only. Geoid undulation is NIL in the AIP; -27 m is an EGM96 estimate for drawing only.",
+      "runways": [
+        { "id": "16", "pair": "34", "true_brg": 159.96, "length_m": 2100, "width_m": 45, "thr": "123841.01N 0995652.75E", "thr_elev_ft": 62, "ils_loc_mhz": null, "gp_deg": 3.0 },
+        { "id": "34", "pair": "16", "true_brg": 339.96, "length_m": 2100, "width_m": 45, "thr": "123741.54N 0995715.28E", "thr_elev_ft": 17, "ils_loc_mhz": null, "gp_deg": 3.0 }
       ]
     }
   }
