@@ -1,0 +1,8 @@
+﻿flight_id,code,level,level_name,event,event_th,t_start_s,t_end_s,t_peak_s,value,unit,detail
+S07_VTBD_21L_SINKRATE_LATE_LINEUP,GPWS_WARNING,3,WARNING,GPWS warning,สัญญาณเตือน GPWS,445.5,461.5,445.5,1,discrete,SINK RATE
+S07_VTBD_21L_SINKRATE_LATE_LINEUP,HIGH_ROD_FINAL,3,WARNING,"High rate of descent below 1,000 ft RA",อัตราร่อนลงสูงช่วง final (<1000 ft),457.5,462.5,457.5,2000.0,fpm,RA 989 ft
+S07_VTBD_21L_SINKRATE_LATE_LINEUP,UNSTABLE_1000,2,CAUTION,"Unstabilised approach at 1,000 ft",การบินเข้าไม่เสถียรที่ 1000 ft,457.5,457.5,457.5,3,,V/S -2000 fpm; LOC -1.4 dot; G/S -2.1 dot
+S07_VTBD_21L_SINKRATE_LATE_LINEUP,GS_DEVIATION,3,WARNING,"Glideslope deviation below 1,000 ft",เบี่ยงเบน glideslope ต่ำกว่า 1000 ft,457.5,497.5,460.5,2.5,dot,-2.50 dot at RA 889 ft
+S07_VTBD_21L_SINKRATE_LATE_LINEUP,LOC_DEVIATION,3,WARNING,"Localiser deviation below 1,000 ft",เบี่ยงเบน localiser ต่ำกว่า 1000 ft,457.5,533.5,523.0,2.39,dot,-2.39 dot at RA 539 ft
+S07_VTBD_21L_SINKRATE_LATE_LINEUP,HIGH_BANK_LOW_ALT,3,WARNING,High bank angle below 500 ft RA,มุมเอียงสูงที่ความสูงต่ำ (<500 ft),526.5,528.0,526.5,20.81,deg,RA 499 ft
+S07_VTBD_21L_SINKRATE_LATE_LINEUP,UNSTABLE_500,3,WARNING,Unstabilised approach at 500 ft,การบินเข้าไม่เสถียรที่ 500 ft (ควร go-around),526.5,526.5,526.5,1,,LOC -2.2 dot

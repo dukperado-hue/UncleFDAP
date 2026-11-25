@@ -1,0 +1,6 @@
+﻿flight_id,code,level,level_name,event,event_th,t_start_s,t_end_s,t_peak_s,value,unit,detail
+S02_VTBD_21R_UNSTABLE,HIGH_ROD_FINAL,2,CAUTION,"High rate of descent below 1,000 ft RA",อัตราร่อนลงสูงช่วง final (<1000 ft),453.5,458.0,453.5,1450.0,fpm,RA 997 ft
+S02_VTBD_21R_UNSTABLE,UNSTABLE_1000,2,CAUTION,"Unstabilised approach at 1,000 ft",การบินเข้าไม่เสถียรที่ 1000 ft,453.5,453.5,453.5,3,,IAS 169 kt > Vapp+20; V/S -1450 fpm; G/S -1.1 dot
+S02_VTBD_21R_UNSTABLE,GS_DEVIATION,2,CAUTION,"Glideslope deviation below 1,000 ft",เบี่ยงเบน glideslope ต่ำกว่า 1000 ft,453.5,469.0,459.5,1.56,dot,-1.56 dot at RA 865 ft
+S02_VTBD_21R_UNSTABLE,UNSTABLE_500,3,WARNING,Unstabilised approach at 500 ft,การบินเข้าไม่เสถียรที่ 500 ft (ควร go-around),498.0,498.0,498.0,1,,IAS 169 kt > Vapp+20
+S02_VTBD_21R_UNSTABLE,LONG_LANDING,3,WARNING,Long landing,แตะพื้นไกลเกินจากหัวรันเวย์,547.0,547.0,547.0,1494.83,m from THR,VTBD RWY 21R: touchdown 1495 m past THR

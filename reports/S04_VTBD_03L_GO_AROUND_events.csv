@@ -1,0 +1,4 @@
+﻿flight_id,code,level,level_name,event,event_th,t_start_s,t_end_s,t_peak_s,value,unit,detail
+S04_VTBD_03L_GO_AROUND,UNSTABLE_1000,2,CAUTION,"Unstabilised approach at 1,000 ft",การบินเข้าไม่เสถียรที่ 1000 ft,456.0,456.0,456.0,1,,LOC +1.1 dot
+S04_VTBD_03L_GO_AROUND,LOC_DEVIATION,2,CAUTION,"Localiser deviation below 1,000 ft",เบี่ยงเบน localiser ต่ำกว่า 1000 ft,456.0,486.0,486.0,1.46,dot,+1.46 dot at RA 640 ft
+S04_VTBD_03L_GO_AROUND,GO_AROUND,1,INFO,Go-around,บินวนขึ้นใหม่ (go-around),486.0,486.0,486.0,640.1,,minimum RA 640 ft

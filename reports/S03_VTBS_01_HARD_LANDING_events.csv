@@ -1,0 +1,2 @@
+﻿flight_id,code,level,level_name,event,event_th,t_start_s,t_end_s,t_peak_s,value,unit,detail
+S03_VTBS_01_HARD_LANDING,HARD_LANDING,3,WARNING,Hard landing,ลงสนามแรง (hard landing),579.5,583.5,580.5,1.9,g,V/S at touchdown -952 fpm

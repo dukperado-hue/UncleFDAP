@@ -1,0 +1,35 @@
+{
+  "source": "AIP Thailand (CAAT eAIP), AIRAC 2026-10-29, AD 2.2 / AD 2.12 / AD 2.19",
+  "source_url": "https://aip.caat.or.th/2026-10-29-AIRAC/html/index-en-GB.html",
+  "note": "Values transcribed from the eAIP. For demonstration only - NOT for navigation.",
+  "airports": {
+    "VTBS": {
+      "name": "Suvarnabhumi",
+      "arp": "134109N 1004456E",
+      "elev_ft": 8,
+      "geoid_undulation_m": -29,
+      "magvar_deg": -0.7,
+      "runways": [
+        { "id": "02R", "pair": "20L", "true_brg": 14.42, "length_m": 3700, "width_m": 60, "thr": "134016.60N 1004404.79E", "thr_elev_ft": 4.2, "ils_loc_mhz": 109.1, "gp_deg": 3.0 },
+        { "id": "20L", "pair": "02R", "true_brg": 194.42, "length_m": 3700, "width_m": 60, "thr": "134213.21N 1004435.44E", "thr_elev_ft": 4.0, "ils_loc_mhz": 109.5, "gp_deg": 3.0 },
+        { "id": "01",  "pair": "19",  "true_brg": 14.42, "length_m": 4000, "width_m": 60, "thr": "133924.11N 1004506.59E", "thr_elev_ft": 3.7, "ils_loc_mhz": 110.1, "gp_deg": 3.0 },
+        { "id": "19",  "pair": "01",  "true_brg": 194.42, "length_m": 4000, "width_m": 60, "thr": "134130.17N 1004539.72E", "thr_elev_ft": 3.7, "ils_loc_mhz": 110.5, "gp_deg": 3.0 },
+        { "id": "02L", "pair": "20R", "true_brg": 14.00, "length_m": 4000, "width_m": 60, "thr": "133954.63N 1004345.28E", "thr_elev_ft": 8, "ils_loc_mhz": null, "gp_deg": 3.0 },
+        { "id": "20R", "pair": "02L", "true_brg": 194.00, "length_m": 4000, "width_m": 60, "thr": "134200.68N 1004418.41E", "thr_elev_ft": 8, "ils_loc_mhz": null, "gp_deg": 3.0 }
+      ]
+    },
+    "VTBD": {
+      "name": "Don Mueang",
+      "arp": "135452N 1003620E",
+      "elev_ft": 9,
+      "geoid_undulation_m": -29,
+      "magvar_deg": -0.7,
+      "runways": [
+        { "id": "03L", "pair": "21R", "true_brg": 29.00, "length_m": 3700, "width_m": 60, "thr": "135349.24N 1003545.38E", "thr_elev_ft": 7, "ils_loc_mhz": 109.7, "gp_deg": 3.0 },
+        { "id": "21R", "pair": "03L", "true_brg": 209.00, "length_m": 3700, "width_m": 60, "thr": "135534.87N 1003644.62E", "thr_elev_ft": 7, "ils_loc_mhz": 109.3, "gp_deg": 3.0 },
+        { "id": "03R", "pair": "21L", "true_brg": 28.00, "length_m": 3500, "width_m": 45, "thr": "135358.45N 1003605.50E", "thr_elev_ft": 5, "ils_loc_mhz": null, "gp_deg": 3.0 },
+        { "id": "21L", "pair": "03R", "true_brg": 208.00, "length_m": 3500, "width_m": 45, "thr": "135528.33N 1003655.97E", "thr_elev_ft": 6, "ils_loc_mhz": 110.3, "gp_deg": 3.0 }
+      ]
+    }
+  }
+}

@@ -1,0 +1,4 @@
+﻿flight_id,code,level,level_name,event,event_th,t_start_s,t_end_s,t_peak_s,value,unit,detail
+S05_VTBS_20L_TAILSTRIKE_RISK,HIGH_PITCH_RATE_ROT,3,WARNING,High pitch rate at rotation,อัตราเงยหัวเร็วเกินขณะ rotate,43.5,56.5,52.5,4.96,deg/s,
+S05_VTBS_20L_TAILSTRIKE_RISK,HIGH_PITCH_LIFTOFF,3,WARNING,High pitch at lift-off,มุมเงยสูงขณะยกตัว (เสี่ยงหางครูด),53.5,53.5,53.5,10.86,deg,
+S05_VTBS_20L_TAILSTRIKE_RISK,HIGH_BANK,2,CAUTION,High bank angle,มุมเอียงสูง,150.0,170.5,165.5,38.36,deg,

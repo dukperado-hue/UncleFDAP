@@ -1,0 +1,8 @@
+__pycache__/
+*.pyc
+.DS_Store
+Thumbs.db
+# real operator data must never be committed - keep it here (ignored)
+private/
+data/private/
+*.real.csv
