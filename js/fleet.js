@@ -38,6 +38,7 @@
       $('#deid').innerHTML = Backend.can('identity')
         ? '🔓 <b>Identified view</b> (gatekeeper): registration, call sign and date are visible for confidential crew contact. Every identity view is logged on the server. · มุมมองระบุตัวตน (gatekeeper) ใช้เพื่อการติดต่อลูกเรือแบบรักษาความลับ'
         : '🔒 <b>De-identified view</b>: flights are shown by pseudonymous key and month only (ICAO Doc 10000 §3.1.7–3.1.9, Annex 19 App. 3). · มุมมองไม่ระบุตัวตน แสดงเฉพาะรหัสแฝงและเดือน';
+      if (Backend.server) $('footer p').innerHTML = '<b>FDAP server.</b> Review actions are saved per user and written to the audit log. Identified data are de-identified automatically ' + esc(Backend.user.deid_days) + ' days after upload unless on investigation hold.';
       this.page = 1;
       this.render();
     },

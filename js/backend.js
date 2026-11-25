@@ -44,6 +44,10 @@
       const box = document.getElementById('userBox'); if (!box) return;
       if (this.server) {
         box.innerHTML = `<span class="role">${this.user.role}</span> <b>${escH(this.user.username)}</b> <button class="btn" id="logoutBtn">Log out</button>`;
+        const nav = document.querySelector('.topnav');
+        if (nav && this.can('admin') && !nav.querySelector('[href="admin.html"]')) nav.insertAdjacentHTML('beforeend', '<a href="admin.html">Admin</a>');
+        if (nav && !this.can('replay')) { const a = nav.querySelector('[href="index.html"]'); if (a) a.remove(); }
+        const syn = document.querySelector('.synthetic'); if (syn) { syn.textContent = 'FDAP SERVER'; syn.title = 'Self-hosted server mode'; }
         box.querySelector('#logoutBtn').addEventListener('click', async () => { await api('logout', { method: 'POST', body: '{}' }).catch(() => {}); location.href = 'login.html'; });
       } else {
         box.innerHTML = `<label class="small">view as <select id="demoRole">${Object.keys(ROLE_CAN).map(r => `<option ${r === this.role ? 'selected' : ''}>${r}</option>`).join('')}</select></label>`;

@@ -6,3 +6,4 @@ Thumbs.db
 private/
 data/private/
 *.real.csv
+server/var/

@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FDAP Sign In</title>
+<meta name="description" content="Sign in to the self-hosted flight data analysis programme server.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=B612+Mono:wght@400;700&family=IBM+Plex+Sans+Thai:wght@400;600&family=IBM+Plex+Sans:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/app.css?v=3">
+<style>
+  .login { max-width: 380px; margin: 10vh auto; padding: 24px; }
+  .login h1 { font: 700 20px var(--mono); color: var(--amber); margin: 0 0 4px; }
+  .login form { display: flex; flex-direction: column; gap: 12px; margin-top: 18px; }
+  .login label { display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: var(--muted); }
+  .login input { background: var(--panel2); color: var(--text); border: 1px solid var(--line); border-radius: 6px; padding: 9px 10px; font: inherit; }
+  .login .btn { padding: 9px; }
+  .login .err { min-height: 18px; font-size: 13px; }
+</style>
+</head>
+<body>
+<main>
+  <div class="panel login">
+    <h1>✈ FDAP server</h1>
+    <p class="small">Flight data analysis programme · ระบบวิเคราะห์ข้อมูลการบิน<br>Protected safety data (ICAO Annex 19, App. 3). Authorised users only — every access is logged.</p>
+    <form id="f" autocomplete="on">
+      <label>Username <input id="u" name="username" autocomplete="username" required></label>
+      <label>Password <input id="p" name="password" type="password" autocomplete="current-password" required></label>
+      <button class="btn primary" type="submit">Sign in · เข้าสู่ระบบ</button>
+      <div id="e" class="err" role="alert"></div>
+    </form>
+  </div>
+</main>
+<script src="js/login.js?v=3"></script>
+</body>
+</html>

@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FDAP Admin</title>
+<meta name="description" content="Users and audit log of the self-hosted FDAP server.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=B612+Mono:wght@400;700&family=IBM+Plex+Sans+Thai:wght@400;600&family=IBM+Plex+Sans:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/app.css?v=3">
+<link rel="stylesheet" href="css/fleet.css?v=3">
+</head>
+<body>
+<header class="top">
+  <div class="brand">
+    <span class="logo">✈</span>
+    <div><h1>FDAP server</h1><p>ผู้ใช้และบันทึกการเข้าถึง (audit log)</p></div>
+    <nav class="topnav"><a href="index.html">Replay</a><a href="fleet.html">Fleet &amp; trends</a><a href="admin.html" class="on">Admin</a></nav>
+    <span id="userBox" class="userbox"></span>
+  </div>
+</header>
+<main>
+  <section class="grid2 fl">
+    <div class="panel">
+      <h2>Users <span class="th">ผู้ใช้</span></h2>
+      <div class="tablewrap"><table id="tUsers" class="dt"></table></div>
+      <form id="addUser" class="filters inline mt">
+        <label>Username <input id="nu" required pattern="[A-Za-z0-9_.\-]{3,40}"></label>
+        <label>Role <select id="nr"><option>analyst</option><option>gatekeeper</option><option>manager</option><option>admin</option></select></label>
+        <button class="btn primary" type="submit">Add user</button>
+      </form>
+      <p id="pwOut" class="deid" hidden></p>
+      <p class="small">Roles: <b>gatekeeper</b> sees identified data for confidential crew contact · <b>analyst</b> de-identified data, replay, review ·
+        <b>manager</b> aggregated statistics only · <b>admin</b> users and audit. Passwords are generated and shown once.</p>
+    </div>
+    <div class="panel">
+      <h2>Audit log <span class="th">บันทึกการเข้าถึงข้อมูล</span></h2>
+      <div class="filters inline"><label>Action <select id="aAct"><option value="">all</option></select></label></div>
+      <div class="tablewrap tall"><table id="tAudit" class="dt"></table></div>
+    </div>
+  </section>
+</main>
+<script src="js/backend.js?v=3"></script>
+<script src="js/admin.js?v=3"></script>
+</body>
+</html>

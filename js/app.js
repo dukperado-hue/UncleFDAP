@@ -287,5 +287,8 @@
   function esc(s) { return String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
 
   window.App = App;
-  window.addEventListener('DOMContentLoaded', async () => { if (window.Backend) await Backend.init(); App.init(); });
+  window.addEventListener('DOMContentLoaded', async () => {
+    if (window.Backend) { await Backend.init(); if (Backend.server && !Backend.can('replay')) { location.replace('fleet.html'); return; } }
+    App.init();
+  });
 })();
